@@ -5,9 +5,9 @@ services:
     image: timescale/timescaledb:latest-pg15
     container_name: crypto_timescaledb
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0000
-      POSTGRES_DB: crypto-data
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0000
+      - POSTGRES_DB=crypto_data
     ports:
       - "5432:5432"
     volumes:
@@ -30,7 +30,7 @@ services:
     env_file:
         - .env.compose  
     volumes:
-      - .:/app
+      - ./src:/app/src:ro
     develop:
       watch:
         - action: rebuild  
@@ -41,7 +41,6 @@ services:
           path: compose.yaml
         - action: rebuild     
           path: .env.compose
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   db_data:
