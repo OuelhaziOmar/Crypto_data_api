@@ -5,3 +5,5 @@ psycopg[binary]
 SQLAlchemy==2.0.43
 sqlmodel==0.0.24
 psycopg2-binary 
+ccxt
+ccxtpro

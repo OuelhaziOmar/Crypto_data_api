@@ -3,7 +3,7 @@
 from sqlmodel import Field, SQLModel
 from datetime import date, datetime
 from typing import Optional
-from ..timescaledb import TimescaleModel
+from timescaledb import TimescaleModel
 
 class Cryptocurrency(SQLModel, table=True):
     __tablename__ = "dim_cryptocurrency"
@@ -26,12 +26,7 @@ class OHLCV(TimescaleModel, table=True):
     __tablename__ = "fact_ohlcv"
 
     # --- Timescale configuration ---
-    __time_column__ = "time"             # which column is the time index
-    __chunk_time_interval__ = "7 days"   # how big each chunk is
-    __drop_after__ = None                # keep data indefinitely
-    __enable_compression__ = True        # enable compression
-    __compress_orderby__ = "time DESC"   # compression order
-    __compress_segmentby__ = "crypto_id" # segment compression by coin
+
 
     # --- Dimensions ---
     crypto_id: int = Field(foreign_key="dim_cryptocurrency.crypto_id", nullable=False)
@@ -44,10 +39,9 @@ class OHLCV(TimescaleModel, table=True):
     close: float
     volume: float
 
-    # --- Derived indicators ---
-    sma_20: Optional[float] = None
-    ema_50: Optional[float] = None
-    rsi_14: Optional[float] = None
+    __chunk_time_interval__ = "INTERVAL '7 days'"   # how big each chunk is
+    __drop_after__ = None                # keep data indefinitely
+
 
 class TechnicalIndicators(TimescaleModel, table=True):
       __tablename__ = "fact_technical_indicators"

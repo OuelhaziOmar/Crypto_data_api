@@ -7,6 +7,7 @@ WORKDIR /app
 # Install OS deps for PostgreSQL client and TimescaleDB
 RUN apt-get update && apt-get install -y \
     gcc \
+    git\
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,6 +16,7 @@ COPY requirements.txt .
 
 # Install Python deps
 RUN pip install --upgrade pip
+RUN pip install git+https://github.com/jmitchel3/timescaledb-python.git
 RUN pip install -r requirements.txt
 
 # Copy app code
