@@ -1,9 +1,8 @@
-
 # db/seed_dimensions.py
-from sqlmodel import Session
-from ...db.models import Cryptocurrency
-from ...db.session import get_session
+from sqlmodel import select
 from datetime import date
+from ...api.models import Cryptocurrency
+from ...db.session import get_session
 
 def seed_cryptocurrencies():
     cryptos = [
@@ -20,8 +19,14 @@ def seed_cryptocurrencies():
     ]
 
     with next(get_session()) as session:
-        for crypto in cryptos:
-            session.add(Cryptocurrency(**crypto))
-        session.commit()
-    print("✅ Inserted 10 cryptocurrencies")
+        for data in cryptos:
+            exists = session.exec(
+                select(Cryptocurrency).where(Cryptocurrency.symbol == data["symbol"])
+            ).first()
 
+            if not exists:  # Insert only if not present
+                session.add(Cryptocurrency(**data))
+
+        session.commit()
+
+    print("✅ Cryptocurrency dimension seeded (skipped existing rows)")

@@ -1,9 +1,8 @@
-
 # db/seed_dimensions.py
-from sqlmodel import Session
-from ...db.models import  Exchange
+
+from sqlmodel import Session, select
+from ...api.models import Exchange
 from ...db.session import get_session
-from datetime import date
 
 def seed_exchanges():
     exchanges = [
@@ -21,6 +20,17 @@ def seed_exchanges():
 
     with next(get_session()) as session:
         for ex in exchanges:
+            # Check if exchange already exists (by name)
+            exists = session.exec(
+                select(Exchange).where(Exchange.name == ex["name"])
+            ).first()
+
+            if exists:
+                print(f"⚠️ {ex['name']} already exists — skipping")
+                continue
+
             session.add(Exchange(**ex))
+
         session.commit()
-    print("✅ Inserted 10 exchanges")
+
+    print("✅ Inserted missing exchanges successfully")

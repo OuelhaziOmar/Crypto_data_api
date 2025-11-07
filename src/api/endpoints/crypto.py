@@ -1,19 +1,14 @@
-from fastapi import APIRouter,Depends
-from ...db.models import *
-from sqlmodel import Session,select
+from fastapi import APIRouter, Depends
+from sqlmodel import Session, select
 from ...db.session import get_session
-from timescaledb import TimescaleModel
-from ...core.static_dimensions.dimcryptocurrency import seed_cryptocurrencies
-from ...core.static_dimensions.dimexchange import seed_exchanges
+from ...api.models import OHLCV
 
-router=APIRouter()
+router = APIRouter()
 
-@router.post('/dimcrypt')
-def addcryptocurrencies():
-    seed_cryptocurrencies()
-    return {'result':'dim fed'}
-@router.post('/dimexchange')
-def addcryptocurrencies():
-    seed_exchanges()
-    return {'result':'dim fed'}
+@router.get("/latest")
+def fetch_latest_data(session: Session = Depends(get_session)):
+    latest = session.exec(
+        select(OHLCV).order_by(OHLCV.time.desc()).limit(1)
+    ).first()
 
+    return latest
